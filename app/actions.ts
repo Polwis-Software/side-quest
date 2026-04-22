@@ -1,7 +1,12 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { supabase } from '@/lib/supabase'
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_ANON_KEY!
+)
 
 export type EmailActionState = { error: string; success?: undefined } | { success: true; error?: undefined } | null
 
