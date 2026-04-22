@@ -6,7 +6,10 @@ import { createClient } from '@supabase/supabase-js'
 export type EmailActionState = { error: string; success?: undefined } | { success: true; error?: undefined } | null
 
 function getSupabase() {
-  return createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!)
+  const url = process.env.SUPABASE_URL
+  const key = process.env.SUPABASE_ANON_KEY
+  if (!url || !key) throw new Error('Supabase env vars missing')
+  return createClient(url, key)
 }
 
 export async function submitEmail(_prev: EmailActionState, formData: FormData): Promise<EmailActionState> {
@@ -16,19 +19,23 @@ export async function submitEmail(_prev: EmailActionState, formData: FormData): 
     return { error: 'Geçerli bir email girin.' }
   }
 
-  const { error } = await getSupabase()
-    .from('waitlist')
-    .insert({ email })
+  try {
+    const { error } = await getSupabase()
+      .from('waitlist')
+      .insert({ email })
 
-  if (error) {
-    if (error.code === '23505') {
-      return { error: 'Bu email zaten kayıtlı.' }
+    if (error) {
+      if (error.code === '23505') return { error: 'Bu email zaten kayıtlı.' }
+      console.error('Supabase insert error:', error.message)
+      return { error: 'Bir hata oluştu, tekrar dene.' }
     }
+
+    revalidatePath('/')
+    return { success: true }
+  } catch (e) {
+    console.error('submitEmail exception:', e)
     return { error: 'Bir hata oluştu, tekrar dene.' }
   }
-
-  revalidatePath('/')
-  return { success: true }
 }
 
 export async function getSignupCount(): Promise<number> {
@@ -37,9 +44,13 @@ export async function getSignupCount(): Promise<number> {
       .from('waitlist')
       .select('*', { count: 'exact', head: true })
 
-    if (error) return 0
+    if (error) {
+      console.error('Supabase count error:', error.message)
+      return 0
+    }
     return count ?? 0
-  } catch {
+  } catch (e) {
+    console.error('getSignupCount exception:', e)
     return 0
   }
 }
