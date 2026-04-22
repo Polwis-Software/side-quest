@@ -3,12 +3,11 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_ANON_KEY!
-)
-
 export type EmailActionState = { error: string; success?: undefined } | { success: true; error?: undefined } | null
+
+function getSupabase() {
+  return createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!)
+}
 
 export async function submitEmail(_prev: EmailActionState, formData: FormData): Promise<EmailActionState> {
   const email = formData.get('email')?.toString().trim()
@@ -17,7 +16,7 @@ export async function submitEmail(_prev: EmailActionState, formData: FormData): 
     return { error: 'Geçerli bir email girin.' }
   }
 
-  const { error } = await supabase
+  const { error } = await getSupabase()
     .from('waitlist')
     .insert({ email })
 
@@ -33,7 +32,7 @@ export async function submitEmail(_prev: EmailActionState, formData: FormData): 
 }
 
 export async function getSignupCount(): Promise<number> {
-  const { count } = await supabase
+  const { count } = await getSupabase()
     .from('waitlist')
     .select('*', { count: 'exact', head: true })
 
