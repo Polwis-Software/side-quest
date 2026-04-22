@@ -4,6 +4,11 @@ import { getSignupCount } from './actions'
 import LandingPage from './components/LandingPage'
 
 export default async function Home() {
-  const signupCount = await getSignupCount()
+  let signupCount = 0
+  try {
+    signupCount = await getSignupCount()
+  } catch {
+    // Supabase unavailable — render page with count 0
+  }
   return <LandingPage signupCount={signupCount} />
 }

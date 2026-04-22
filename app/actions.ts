@@ -32,9 +32,14 @@ export async function submitEmail(_prev: EmailActionState, formData: FormData): 
 }
 
 export async function getSignupCount(): Promise<number> {
-  const { count } = await getSupabase()
-    .from('waitlist')
-    .select('*', { count: 'exact', head: true })
+  try {
+    const { count, error } = await getSupabase()
+      .from('waitlist')
+      .select('*', { count: 'exact', head: true })
 
-  return count ?? 0
+    if (error) return 0
+    return count ?? 0
+  } catch {
+    return 0
+  }
 }
