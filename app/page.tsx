@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { getSignupCount } from './actions'
 import LandingPage from './components/LandingPage'
 
