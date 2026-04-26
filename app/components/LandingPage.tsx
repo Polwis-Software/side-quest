@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { i18n, type Lang } from '@/app/lib/i18n'
 import SignupForm from '@/app/signup-form'
+import NavBar from '@/app/components/NavBar'
 
 /* ─── design tokens ─────────────────────────────────────────── */
 const bg       = '#0b0916'
@@ -393,22 +394,7 @@ export default function LandingPage({ signupCount }: { signupCount: number }) {
       <main style={{ backgroundColor: bg, minHeight:'100vh', fontFamily:'system-ui,sans-serif', color:text, overflowX:'hidden' }}>
 
         {/* ── NAV ── */}
-        <nav style={{
-          position:'sticky', top:0, zIndex:200,
-          backgroundColor:'rgba(11,9,22,0.85)',
-          backdropFilter:'blur(20px)',
-          borderBottom:`0.5px solid ${divider}`,
-        }}>
-          <div className="section-inner" style={{ maxWidth:900, margin:'0 auto', padding:'17px 40px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-            <div style={{ fontSize:'19px', fontWeight:'700', color:purple, letterSpacing:'-0.3px' }}>Side Quest</div>
-            <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-              <button className="lang-btn" onClick={() => setLang(lang === 'tr' ? 'en' : 'tr')}>
-                {lang === 'tr' ? 'EN' : 'TR'}
-              </button>
-              <div className="early-badge">{t.nav.earlyAccess}</div>
-            </div>
-          </div>
-        </nav>
+        <NavBar lang={lang} onLangToggle={() => setLang(lang === 'tr' ? 'en' : 'tr')} />
 
         {/* ── HERO ── */}
         <section style={{ position:'relative', overflow:'hidden', padding:'120px 40px 100px', textAlign:'center' }}>
